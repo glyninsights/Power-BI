@@ -1,0 +1,7 @@
+let
+    Fonte = DateTimeZone.SwitchZone(DateTimeZone.LocalNow(), -3),
+    ConvertidoEmTabela = #table(1, {{Fonte}}),
+    Renomear = Table.RenameColumns(ConvertidoEmTabela,{{"Column1", "DataHora"}}),
+    TipoAlterado = Table.TransformColumnTypes(Renomear,{{"DataHora", type datetime}})
+in
+    TipoAlterado
