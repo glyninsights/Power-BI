@@ -1,0 +1,1 @@
+UltimaAtualizacao = "Última atualização: " & MAX(UltimaAtualizacaoUTC[DataHora])
