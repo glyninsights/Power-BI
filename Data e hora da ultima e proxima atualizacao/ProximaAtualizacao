@@ -3,14 +3,21 @@ var DataHoraAtual = NOW()
 var DataAtual = DATEVALUE(DataHoraAtual)
 var HoraAtual = TIMEVALUE(DataHoraAtual)
 
-var AgendamentoHoje = 
+var AgendamentoInicial = 
 FILTER(
     Agendamentos,
-    TIMEVALUE([DataHora]) > HoraAtual
+    [DataHora] > DataHoraAtual
 )
 
-var ProximaAtualizacaoHoje = 
-MINX(AgendamentoHoje, [DataHora])
+var AgendamentoHoje = 
+ADDCOLUMNS(
+    FILTER(
+        Agendamentos,
+        TIMEVALUE([DataHora]) > HoraAtual
+    ),
+    "Hoje",
+    DataAtual + TIMEVALUE(Agendamentos[DataHora])
+)
 
 var AgendamentoAmanha = 
 ADDCOLUMNS(
@@ -19,14 +26,16 @@ ADDCOLUMNS(
     DataAtual + 1 + TIMEVALUE(Agendamentos[DataHora])
 )
 
-var ProximaAtualizacaoAmanha = 
-MINX(AgendamentoAmanha, [Amanha])
+var ProximaAtualizacaoInicio = MINX(AgendamentoInicial, [DataHora])
+var ProximaAtualizacaoHoje = MINX(AgendamentoHoje, [Hoje])
+var ProximaAtualizacaoAmanha = MINX(AgendamentoAmanha, [Amanha])
 
 var ProximaAtualizacao = 
-IF(
-    ISBLANK(ProximaAtualizacaoHoje),
-    ProximaAtualizacaoAmanha,
-    ProximaAtualizacaoHoje
+SWITCH(
+    TRUE(),
+    DataHoraAtual <= ProximaAtualizacaoInicio, ProximaAtualizacaoInicio,
+    DataHoraAtual > ProximaAtualizacaoInicio && DataHoraAtual <= ProximaAtualizacaoHoje, ProximaAtualizacaoHoje,
+    ProximaAtualizacaoAmanha
 )
 
 return "Próxima atualização: " & ProximaAtualizacao
